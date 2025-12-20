@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Trip Expense Splitter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --muted: #9ca3af;
+      --text: #e5e7eb;
+      --accent: #22c55e;
+      --danger: #ef4444;
+      --border: #1f2937;
+      --link: #60a5fa;
+      --warn: #f59e0b;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+    }
+
+    header {
+      padding: 20px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 18px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 960px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      font-size: 1.1rem;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      background: #0b1220;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px;
+      border-radius: 10px;
+      min-width: 140px;
+    }
+
+    input[type="number"] {
+      width: 140px;
+    }
+
+    button {
+      background: #1f2937;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: #06210a;
+      border: none;
+    }
+
+    button.danger {
+      background: var(--danger);
+      color: #fff;
+      border: none;
+    }
+
+    button.warn {
+      background: var(--warn);
+      color: #1f1f1f;
+      border: none;
+    }
+
+    button.link {
+      background: transparent;
+      color: var(--link);
+      border: none;
+      padding: 6px 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #0b1220;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 10px;
+      margin: 4px 6px 0 0;
+    }
+
+    .chip .x {
+      color: var(--danger);
+      cursor: pointer;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .mono {
+      font-family: var(--mono);
+    }
+
+    .footer {
+      color: var(--muted);
+      font-size: 0.85rem;
+      padding: 0 18px 24px;
+      text-align: center;
+    }
+
+    .totals {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .totals div {
+      background: #0b1220;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .flex-spacer {
+      flex: 1;
+    }
+
+    .amount-pos {
+      color: var(--accent);
+    }
+
+    .amount-neg {
+      color: var(--danger);
+    }
+
+    .amount-zero {
+      color: var(--muted);
+    }
+
+    .nowrap {
+      white-space: nowrap;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .note {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Trip Expense Splitter</h1>
+    <div class="row">
+      <label class="row">
+        <span class="muted">Currency</span>
+        <input type="text" id="currency" value="$" maxlength="3" style="width:60px" />
+      </label>
+      <button id="btn-print" class="warn">Print / PDF</button>
+      <button id="btn-save" class="primary">Save</button>
+      <button id="btn-load">Load</button>
+      <button id="btn-clear" class="danger">Clear</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="grid">
+      <!-- Participants -->
+      <section class="card">
+        <h2>Participants</h2>
+        <div class="row">
+          <input type="text" id="participant-name" placeholder="Add participant..." />
+          <button id="add-participant" class="primary">Add</button>
+          <div class="note">Equal share uses the number of participants (even if someone didn’t pay).</div>
+        </div>
+        <div id="participants-list"></div>
+      </section>
+
+      <!-- Add Expense -->
+      <section class="card">
+        <h2>Add Expense</h2>
+        <div class="row">
+          <select id="expense-person"></select>
+          <input type="number" id="expense-amount" step="0.01" min="0" placeholder="Amount" />
+          <input type="text" id="expense-desc" placeholder="Description (optional)" />
+          <button id="add-expense" class="primary">Add Expense</button>
+        </div>
+        <div class="note">Tip: use CSV import/export below for bulk editing.</div>
+      </section>
+    </div>
+
+    <!-- Expenses Table -->
+    <section class="card">
+      <h2>Expenses</h2>
+      <div class="row" style="justify-content: space-between;">
+        <div class="row">
+          <input type="file" id="csv-file" accept=".csv" />
+          <button id="btn-import">Import CSV</button>
+          <button id="btn-export">Export CSV</button>
+          <button id="btn-sample" class="link">Load Sample Data</button>
+        </div>
+        <div class="row">
+          <span class="muted">Rows: <span id="rows-count">0</span></span>
+        </div>
+      </div>
+      <table id="expenses-table">
+        <thead>
+          <tr>
+            <th>Person</th>
+            <th class="nowrap">Amount</th>
+            <th>Description</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- Summary -->
+    <section class="card">
+      <h2>Summary</h2>
+      <div class="totals">
+        <div>
+          <div class="muted">Participants</div>
+          <div id="summary-participants" class="mono"></div>
+        </div>
+        <div>
+          <div class="muted">Total Spent</div>
+          <div id="summary-total" class="mono"></div>
+        </div>
+        <div>
+          <div class="muted">Equal Share / Person</div>
+          <div id="summary-share" class="mono"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Balances -->
+    <section class="card">
+      <h2>Balances (positive = should receive, negative = owes)</h2>
+      <table id="balances-table">
+        <thead>
+          <tr>
+            <th>Person</th>
+            <th>Paid</th>
+            <th>Balance</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div id="rounding-note" class="note hidden"></div>
+    </section>
+
+    <!-- Settlements -->
+    <section class="card">
+      <h2>Suggested Settlements</h2>
+      <table id="settlements-table">
+        <thead>
+          <tr>
+            <th>Payer</th>
+            <th>Receiver</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="note">Greedy matching minimizes the number of payments for exact settlement.</div>
+    </section>
+  </div>
+
+  <div class="footer">
+    Built for cabin trips & group events. Rounds to cents to avoid floating-point issues.
+  </div>
+
+  <script>
+    // -------- Utility: Rounding & formatting --------
+    function roundCents(x) {
+      return Math.round((x + 1e-9) * 100) / 100;
+    }
+    function fmtMoney(x, currency) {
+      const v = roundCents(x).toFixed(2);
+      return `${currency}${v}`;
+    }
+    function deepCopy(obj) { return JSON.parse(JSON.stringify(obj)); }
+
+    // -------- App State --------
+    const state = {
+      participants: [],    // array of strings
+      expenses: [],        // { person, amount, description }
+      currency: "$",
+    };
+
+    // -------- Core Logic --------
+    function computeBalances(expenses, participants) {
+      const paidBy = Object.create(null);
+      participants.forEach(p => paidBy[p] = 0);
+      let total = 0;
+
+      for (const e of expenses) {
+        if (!(e.person in paidBy)) {
+          // If an expense references a non-participant, include them automatically.
+          paidBy[e.person] = 0;
+          participants.push(e.person);
+        }
+        paidBy[e.person] = roundCents(paidBy[e.person] + Number(e.amount || 0));
+        total = roundCents(total + Number(e.amount || 0));
+      }
+
+      const unique = Array.from(new Set(participants));
+      const n = unique.length;
+      if (n === 0) {
+        return { balances: {}, equalShare: 0, total: 0, paidBy: {} };
+      }
+
+      const equalShare = roundCents(total / n);
+      const balances = {};
+      for (const p of unique) {
+        const bal = roundCents(paidBy[p] - equalShare);
+        balances[p] = bal;
+      }
+
+      // Reconcile rounding discrepancy to ensure sum(balances) === 0 within cents
+      const sumBal = roundCents(Object.values(balances).reduce((a, b) => a + b, 0));
+      let discrepancy = roundCents(sumBal);
+      let appliedFix = 0;
+
+      if (Math.abs(discrepancy) >= 0.01) {
+        // Nudge the largest-magnitude balance
+        const key = Object.keys(balances).sort((a, b) =>
+          Math.abs(balances[b]) - Math.abs(balances[a])
+        )[0];
+        balances[key] = roundCents(balances[key] - discrepancy);
+        appliedFix = discrepancy;
+        discrepancy = 0;
+      }
+
+      return { balances, equalShare, total, paidBy, participants: unique, appliedFix };
+    }
+
+    function computeMinimalSettlements(balances) {
+      const debtors = [];   // [person, amount_owed_positive]
+      const creditors = []; // [person, amount_to_receive_positive]
+
+      for (const [person, bal] of Object.entries(balances)) {
+        if (bal < -0.004) debtors.push([person, roundCents(-bal)]);
+        else if (bal > 0.004) creditors.push([person, roundCents(bal)]);
+      }
+
+      // Sort for deterministic output
+      debtors.sort((a, b) => a[0].localeCompare(b[0]));
+      creditors.sort((a, b) => a[0].localeCompare(b[0]));
+
+      const settlements = [];
+      let i = 0, j = 0;
+
+      while (i < debtors.length && j < creditors.length) {
+        let [dPerson, dAmt] = debtors[i];
+        let [cPerson, cAmt] = creditors[j];
+
+        const payment = roundCents(Math.min(dAmt, cAmt));
+        if (payment >= 0.01) {
+          settlements.push({ payer: dPerson, receiver: cPerson, amount: payment });
+          dAmt = roundCents(dAmt - payment);
+          cAmt = roundCents(cAmt - payment);
+        }
+
+        if (dAmt <= 0.004) i++; else debtors[i][1] = dAmt;
+        if (cAmt <= 0.004) j++; else creditors[j][1] = cAmt;
+      }
+      return settlements;
+    }
+
+    // -------- Render --------
+    function renderParticipants() {
+      const box = document.getElementById("participants-list");
+      box.innerHTML = "";
+      state.participants.forEach(name => {
+        const chip = document.createElement("span");
+        chip.className = "chip";
+        chip.innerHTML = `<span>${escapeHtml(name)}</span><span class="x" title="Remove">✕</span>`;
+        chip.querySelector(".x").addEventListener("click", () => {
+          state.participants = state.participants.filter(p => p !== name);
+          // Also remove expenses by this person (optional: comment out to keep)
+          // state.expenses = state.expenses.filter(e => e.person !== name);
+          syncPersonSelect();
+          renderAll();
+        });
+        box.appendChild(chip);
+      });
+      syncPersonSelect();
+    }
+
+    function syncPersonSelect() {
+      const sel = document.getElementById("expense-person");
+      const current = sel.value;
+      sel.innerHTML = "";
+      state.participants.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p; opt.textContent = p;
+        sel.appendChild(opt);
+      });
+      if (state.participants.length === 0) {
+        const opt = document.createElement("option");
+        opt.value = ""; opt.textContent = "(add participants first)";
+        sel.appendChild(opt);
+      } else {
+        sel.value = current || state.participants[0];
+      }
+    }
+
+    function renderExpenses() {
+      const tbody = document.querySelector("#expenses-table tbody");
+      tbody.innerHTML = "";
+      document.getElementById("rows-count").textContent = String(state.expenses.length);
+
+      for (let i = 0; i < state.expenses.length; i++) {
+        const e = state.expenses[i];
+        const tr = document.createElement("tr");
+
+        const tdPerson = document.createElement("td");
+        tdPerson.textContent = e.person;
+        const tdAmt = document.createElement("td");
+        tdAmt.className = "mono";
+        tdAmt.textContent = fmtMoney(Number(e.amount || 0), state.currency);
+        const tdDesc = document.createElement("td");
+        tdDesc.textContent = e.description || "";
+        const tdDel = document.createElement("td");
+        const btn = document.createElement("button");
+        btn.className = "danger";
+        btn.textContent = "Delete";
+        btn.addEventListener("click", () => {
+          state.expenses.splice(i, 1);
+          renderAll();
+        });
+        tdDel.appendChild(btn);
+
+        tr.appendChild(tdPerson);
+        tr.appendChild(tdAmt);
+        tr.appendChild(tdDesc);
+        tr.appendChild(tdDel);
+        tbody.appendChild(tr);
+      }
+    }
+
+    function renderSummaryAndBalances() {
+      const { balances, equalShare, total, paidBy, participants, appliedFix } =
+        computeBalances(state.expenses, deepCopy(state.participants));
+
+      document.getElementById("summary-participants").textContent = `${participants.length} people`;
+      document.getElementById("summary-total").textContent = fmtMoney(total, state.currency);
+      document.getElementById("summary-share").textContent = fmtMoney(equalShare, state.currency);
+
+      const roundingNote = document.getElementById("rounding-note");
+      if (appliedFix && Math.abs(appliedFix) >= 0.01) {
+        roundingNote.classList.remove("hidden");
+        roundingNote.textContent =
+          `Note: Applied a ${fmtMoney(appliedFix, state.currency)} rounding fix to keep totals consistent.`;
+      } else {
+        roundingNote.classList.add("hidden");
+        roundingNote.textContent = "";
+      }
+
+      const tbody = document.querySelector("#balances-table tbody");
+      tbody.innerHTML = "";
+
+      const entries = Object.keys(balances).sort((a, b) => a.localeCompare(b));
+      for (const p of entries) {
+        const tr = document.createElement("tr");
+
+        const tdP = document.createElement("td"); tdP.textContent = p;
+        const tdPaid = document.createElement("td"); tdPaid.className = "mono";
+        tdPaid.textContent = fmtMoney(paidBy[p] || 0, state.currency);
+
+        const bal = balances[p] || 0;
+        const tdBal = document.createElement("td");
+        tdBal.className = "mono " +
+          (bal > 0.004 ? "amount-pos" : bal < -0.004 ? "amount-neg" : "amount-zero");
+        tdBal.textContent = fmtMoney(bal, state.currency);
+
+        tr.appendChild(tdP);
+        tr.appendChild(tdPaid);
+        tr.appendChild(tdBal);
+        tbody.appendChild(tr);
+      }
+
+      // Store latest computed artifacts for settlements rendering
+      state._lastBalances = balances;
+    }
+
+    function renderSettlements() {
+      const balances = state._lastBalances || {};
+      const settlements = computeMinimalSettlements(balances);
+      const tbody = document.querySelector("#settlements-table tbody");
+      tbody.innerHTML = "";
+
+      if (settlements.length === 0) {
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 3;
+        td.className = "muted";
+        td.textContent = "All settled—no transactions needed.";
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        return;
+      }
+
+      for (const s of settlements) {
+        const tr = document.createElement("tr");
+        const tdP = document.createElement("td"); tdP.textContent = s.payer;
+        const tdR = document.createElement("td"); tdR.textContent = s.receiver;
+        const tdA = document.createElement("td"); tdA.className = "mono";
+        tdA.textContent = fmtMoney(s.amount, state.currency);
+        tr.appendChild(tdP); tr.appendChild(tdR); tr.appendChild(tdA);
+        tbody.appendChild(tr);
+      }
+    }
+
+    function renderAll() {
+      document.getElementById("currency").value = state.currency;
+      renderParticipants();
+      renderExpenses();
+      renderSummaryAndBalances();
+      renderSettlements();
+    }
+
+    // -------- CSV Import/Export --------
+    function parseCSV(text) {
+      // Simple CSV: person,amount,description (no embedded commas or quoted fields).
+      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+      if (lines.length === 0) return [];
+
+      let start = 0;
+      const header = lines[0].toLowerCase();
+      if (header.includes("person") && header.includes("amount")) start = 1;
+
+      const out = [];
+      for (let i = start; i < lines.length; i++) {
+        const parts = lines[i].split(",").map(s => s.trim());
+        if (parts.length < 2) continue;
+        const person = parts[0];
+        const amount = parseFloat(parts[1]);
+        const description = parts.slice(2).join(",") || "";
+        if (!person || isNaN(amount)) continue;
+        out.push({ person, amount, description });
+      }
+      return out;
+    }
+
+    function toCSV(expenses) {
+      const rows = [["person", "amount", "description"]];
+      for (const e of expenses) {
+        rows.push([e.person, String(roundCents(e.amount)), e.description || ""]);
+      }
+      return rows.map(r => r.join(",")).join("\n");
+    }
+
+    function download(filename, text) {
+      const blob = new Blob([text], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click();
+      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 0);
+    }
+
+    // -------- Helpers --------
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[c]));
+    }
+
+    // -------- Event Wiring --------
+    document.getElementById("add-participant").addEventListener("click", () => {
+      const inp = document.getElementById("participant-name");
+      const name = inp.value.trim();
+      if (!name) return;
+      if (!state.participants.includes(name)) {
+        state.participants.push(name);
+        inp.value = "";
+        renderAll();
+      }
+    });
+
+    document.getElementById("add-expense").addEventListener("click", () => {
+      const person = document.getElementById("expense-person").value;
+      const amount = parseFloat(document.getElementById("expense-amount").value);
+      const description = document.getElementById("expense-desc").value.trim();
+      if (!person) return alert("Select a person.");
+      if (isNaN(amount) || amount <= 0) return alert("Enter a positive amount.");
+      state.expenses.push({ person, amount: roundCents(amount), description });
+      document.getElementById("expense-amount").value = "";
+      document.getElementById("expense-desc").value = "";
+      renderAll();
+    });
+
+    document.getElementById("btn-import").addEventListener("click", () => {
+      const fileInput = document.getElementById("csv-file");
+      const file = fileInput.files && fileInput.files[0];
+      if (!file) return alert("Choose a CSV file first.");
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = String(e.target.result || "");
+        const imported = parseCSV(text);
+        if (imported.length === 0) return alert("No valid rows found in CSV.");
+        // Add any new people from CSV into participants list
+        const names = new Set(state.participants);
+        imported.forEach(e => names.add(e.person));
+        state.participants = Array.from(names);
+        state.expenses = imported;
+        renderAll();
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById("btn-export").addEventListener("click", () => {
+      const csv = toCSV(state.expenses);
+      download("trip_expenses.csv", csv);
+    });
+
+    document.getElementById("btn-save").addEventListener("click", () => {
+      const payload = JSON.stringify(state);
+      localStorage.setItem("expenseSplitterState", payload);
+      alert("Saved locally in your browser.");
+    });
+
+    document.getElementById("btn-load").addEventListener("click", () => {
+      const payload = localStorage.getItem("expenseSplitterState");
+      if (!payload) return alert("No saved data found.");
+      try {
+        const saved = JSON.parse(payload);
+        state.participants = Array.from(new Set(saved.participants || []));
+        state.expenses = Array.isArray(saved.expenses) ? saved.expenses : [];
+        state.currency = saved.currency || "$";
+        renderAll();
+      } catch (e) {
+        alert("Failed to load saved data.");
+      }
+    });
+
+    document.getElementById("btn-clear").addEventListener("click", () => {
+      if (!confirm("Clear all participants and expenses?")) return;
+      state.participants = [];
+      state.expenses = [];
+      renderAll();
+    });
+
+    document.getElementById("btn-print").addEventListener("click", () => {
+      window.print();
+    });
+
+    document.getElementById("currency").addEventListener("input", (e) => {
+      const val = e.target.value.trim();
+      state.currency = val || "$";
+      renderAll();
+    });
+
+    document.getElementById("btn-sample").addEventListener("click", () => {
+      state.participants = ["Alice", "Bob", "Carol", "Dave", "Eve"];
+      state.expenses = [
+        { person: "Alice", amount: 120.00, description: "Groceries" },
+        { person: "Bob", amount: 80.00, description: "Fuel" },
+        { person: "Carol", amount: 50.00, description: "Snacks" },
+        { person: "Dave", amount: 150.00, description: "Cabin rental" },
+        { person: "Eve", amount: 100.00, description: "Accessories" },
+      ];
+      renderAll();
+    });
+
+    // -------- Init --------
+    renderAll();
+  </script>
+</body>
