@@ -1,34 +1,47 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import { Participants } from './components/Participants'
+import { ExpenseAdder } from './components/ExpenseAdder'
+import { ExpenseList } from './components/ExpenseList'
+import { Balances } from './components/Balances'
+import { Settlements } from './components/Settlements'
+import { Footer } from './components/Footer'
+
+export interface Expense {
+  name: string,
+  sum: number,
+  description: string
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+
+  const [participants, setParticipants] = useState<string[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+
+  function onAddParticipant(participant: string) {
+   setParticipants([...participants, participant])
+    console.log("Added participant " + participant);
+  }
+
+  function onDeleteParticipant(participant: string) {
+    const currentParticipants = participants.filter(tempParticipant => tempParticipant != participant);
+    setParticipants(currentParticipants);
+  }
+
+  function onAddExpense(expensePerson: string, expenseSum: string, expenseDescription: string) {
+    setExpenses([...expenses, {name: expensePerson, sum: Number(expenseSum), description: expenseDescription}]);
+  }
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <h1>Bine ati venit la HBS (Hikereala bill splitter) !</h1>
+    <Participants onAddParticipant={onAddParticipant} participantList={participants} onDeleteParticipant={onDeleteParticipant}/>
+    <ExpenseAdder participantList={participants} onAddExpense={onAddExpense}/>
+    <ExpenseList expenses={expenses}/>
+    <Balances expenses={expenses}/>
+    <Settlements/>
+    <Footer/>
+     </>
   )
 }
 
