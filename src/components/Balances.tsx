@@ -1,7 +1,8 @@
 import type { Expense } from "../App"
 
 export interface IBalancesProps {
-    expenses: Expense[]
+    expenses: Expense[],
+    onSetBalances: any
 }
 
 export interface BalancePerPerson {
@@ -9,7 +10,7 @@ export interface BalancePerPerson {
     balance: number
 }
 
-function calculateBalances(expenses: Expense[]) {
+export function calculateBalances(expenses: Expense[]) {
     let totalSum = 0;
     let balances: BalancePerPerson[] = [];
 
@@ -37,15 +38,21 @@ function calculateBalances(expenses: Expense[]) {
         totalSum += expense.sum;
     }
 
-    const sumPerPerson = totalSum / expenses.length;
+    const sumPerPerson = totalSum / balances.length;
 
+   const updatedBalances = balances.map(balance => {
+    const newBalance: BalancePerPerson = {name: balance.name, balance: balance.balance - sumPerPerson};
+    return newBalance;
+});
 
-    return balances;
+    return updatedBalances;
 }
 
 export function Balances(props: IBalancesProps) {
 
     const calculatedBalances = calculateBalances(props.expenses);
+
+    // props.onSetBalances(calculatedBalances);
 
     return(
         <>
@@ -56,7 +63,14 @@ export function Balances(props: IBalancesProps) {
             <td>Suma platita</td>
             <td>Sold</td>
          </tr>
-       {calculatedBalances.map(calculatedBalance => <p>{calculatedBalance.name} --- {calculatedBalance.balance}</p>)}
+       {calculatedBalances.map(calculatedBalance => {
+        if (calculatedBalance.balance < 0) {
+            return  <p style={{color: "red"}}>{calculatedBalance.name} : {calculatedBalance.balance}</p>
+        }
+        else {
+              return <p style={{color: "green"}}>{calculatedBalance.name} : {calculatedBalance.balance}</p>
+        }
+})}
         </table>
         </>
     )
