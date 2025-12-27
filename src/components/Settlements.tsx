@@ -34,61 +34,51 @@ export function Settlements(props: ISettlementsProps) {
                 <td>Hikerist platitor</td>
                 <td>Hikerist primitor</td>
                 <td>Suma</td>
-        {settlementRows}
             </tr>
+            {settlementRows}
         </table>
     </>
     )
 }
 
 function calculateSettlements(balances: BalancePerPerson[]) {
-    let allDuesPaid = false;
     let settlements: ISettlement[] = [];
 
     balances.sort((balanceA, balanceB) => balanceA.balance - balanceB.balance);
 
-    while(!allDuesPaid) {
-        const currentHighestPayer = balances[0];
-        const currentHighestReceiver = balances[balances.length - 1];
+    const debtors = balances.filter(balance => balance.balance < 0);
+    const creditors = balances.filter(balance => balance.balance > 0);
 
-        if (currentHighestPayer.name == currentHighestReceiver.name) {
-            allDuesPaid = true;
-            break;
+      let i = 0, j = 0;
+
+      while (i < debtors.length && j < creditors.length) {
+        let debtor = debtors[i];
+        let creditor = creditors[j];
+        let debtorAmount = -debtor.balance;
+        let creditorAmount = creditor.balance;
+
+        const payment = Math.min(-debtor.balance, creditor.balance);
+        if (payment >= 0.01) {
+          settlements.push({ sender: debtor.name, receiver: creditor.name, sum: payment } as ISettlement);
+          debtorAmount = debtorAmount - payment;
+          creditorAmount = creditorAmount - payment;
         }
 
-         let toSubtract = 0;
-
-        if (currentHighestPayer.balance >= -currentHighestReceiver.balance) {
-            toSubtract = currentHighestPayer.balance;
+        if (debtorAmount == 0 ) {
+            i++;        
         }
-        else {
-            toSubtract = currentHighestReceiver.balance;
+        else { 
+            debtors[i].balance = debtorAmount;
         }
 
-        const recalculatedBalances: BalancePerPerson[]  = balances.map(newBalance => {
-            if (newBalance.name == currentHighestReceiver.name) {
-                return {name: newBalance.name, balance: newBalance.balance + toSubtract} as BalancePerPerson; 
-            }
-            else {
-               
-
-                if (newBalance.name == currentHighestPayer.name){
-                    settlements.push({sender: currentHighestPayer.name, receiver: currentHighestReceiver.name, sum: -toSubtract})
-                    return {name: newBalance.name, balance: newBalance.balance - toSubtract} as BalancePerPerson
-                }
-                
-                if (newBalance.name == currentHighestReceiver.name) {
-                    return {name: newBalance.name, balance: newBalance.balance - toSubtract} as BalancePerPerson    
-                }
-
-                
-
-                return {name: "", balance: 3} as BalancePerPerson
-            }
-        })
-
-        return settlements;
-    }
+          if (creditorAmount == 0 ) {
+            j++;        
+        }
+        else { 
+            creditors[j].balance = creditorAmount;
+        }
+        
+      }
 
     return settlements;
 }

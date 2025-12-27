@@ -60,15 +60,14 @@ export function Balances(props: IBalancesProps) {
         <table>
                <tr>
             <td>Hikerist</td>
-            <td>Suma platita</td>
             <td>Sold</td>
          </tr>
        {calculatedBalances.map(calculatedBalance => {
         if (calculatedBalance.balance < 0) {
-            return  <p style={{color: "red"}}>{calculatedBalance.name} : {calculatedBalance.balance}</p>
+            return  <tr><td>{calculatedBalance.name}</td><td className="negative-balance">{calculatedBalance.balance}</td></tr>
         }
         else {
-              return <p style={{color: "green"}}>{calculatedBalance.name} : {calculatedBalance.balance}</p>
+              return <tr><td>{calculatedBalance.name}</td><td className="positive-balance">{calculatedBalance.balance}</td></tr>
         }
 })}
         </table>
