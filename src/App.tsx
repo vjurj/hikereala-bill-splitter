@@ -6,6 +6,7 @@ import { ExpenseList } from './components/ExpenseList'
 import { Balances, type BalancePerPerson } from './components/Balances'
 import { Settlements } from './components/Settlements'
 import { Footer } from './components/Footer'
+import { Paper, Typography } from '@mui/material'
 
 export interface Expense {
   name: string,
@@ -17,7 +18,7 @@ function App() {
 
   const [participants, setParticipants] = useState<string[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [balances, setBalances] = useState<BalancePerPerson[]>([])
+  const [, setBalances] = useState<BalancePerPerson[]>([])
 
   function onAddParticipant(participant: string) {
    setParticipants([...participants, participant])
@@ -38,15 +39,16 @@ function App() {
   }
 
   return (
-    <>
-    <h1>Bine ati venit la HBS (Hikereala bill splitter) !</h1>
+    <Paper>
+    <Typography variant="h4">HBS </Typography>
+    <Typography variant="h5">(Hikereala bill splitter)</Typography>
     <Participants onAddParticipant={onAddParticipant} participantList={participants} onDeleteParticipant={onDeleteParticipant}/>
     <ExpenseAdder participantList={participants} onAddExpense={onAddExpense}/>
     <ExpenseList expenses={expenses}/>
     <Balances expenses={expenses} onSetBalances={onSetBalances}/>
     <Settlements expenses={expenses}/>
     <Footer/>
-     </>
+     </Paper>
   )
 }
 

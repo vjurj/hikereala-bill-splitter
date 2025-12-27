@@ -1,4 +1,4 @@
-import { Button, Chip, TextField } from "@mui/material"
+import { Button, Card, Chip, TextField, Typography } from "@mui/material"
 import { useState } from "react"
 
 export interface IParticipantsProps {
@@ -12,19 +12,18 @@ export function Participants(
     const [participantToAdd, setParticipantToAdd] = useState<string>();
 
     function handleDelete(chipToDelete: any) {
-        alert("deleted " + chipToDelete);
         props.onDeleteParticipant(chipToDelete)
     }
 
     return (
-        <>
-        <h1>Hikeristii participanti</h1>
+       <Card sx={{marginTop: "24px", padding: "8px"}}>
+        <Typography variant="h4" >Hikeristii participanti</Typography>
         <TextField onChange={(event) => setParticipantToAdd(event.target.value)} value={participantToAdd} size="small"></TextField>
         <Button onClick={() => props.onAddParticipant(participantToAdd)}variant="contained">Adauga hikeristul/hikerista</Button>
         <div>
-            {props.participantList.map(participant => <Chip label={participant} onDelete={() => handleDelete(participant)}></Chip>)}
+            {props.participantList.map(participant => <Chip sx={{margin: "4px"}} color="info" label={participant} onDelete={() => handleDelete(participant)}></Chip>)}
         </div>
-        <p>Fiecare isi va primi/plati partea, chiar daca nu a cumparat nimic</p>
-        </>
+        {/* <Typography>Fiecare isi va primi/plati partea, chiar daca nu a cumparat nimic</Typography> */}
+        </Card>
     )
 }

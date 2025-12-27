@@ -1,3 +1,4 @@
+import { Card, Typography } from "@mui/material";
 import type { Expense } from "../App"
 
 export interface IBalancesProps {
@@ -55,9 +56,9 @@ export function Balances(props: IBalancesProps) {
     // props.onSetBalances(calculatedBalances);
 
     return(
-        <>
-        <h1>Solduri (pozitiv = de primit, negativ = de platit)</h1>
-        <table>
+        <Card sx={{marginTop: "24px", width: "100%", padding: "8px"}}>
+            <Typography variant="h4">Solduri (pozitiv = de primit, negativ = de platit)</Typography>
+        <table style={{maxWidth: "960px", marginInline: "auto", marginTop: "16px"}}>
                <tr>
             <td>Hikerist</td>
             <td>Sold</td>
@@ -71,6 +72,6 @@ export function Balances(props: IBalancesProps) {
         }
 })}
         </table>
-        </>
+        </Card>
     )
 }

@@ -1,3 +1,4 @@
+import { Card, Typography } from "@mui/material";
 import type { Expense } from "../App";
 import { calculateBalances, type BalancePerPerson } from "./Balances"
 
@@ -27,9 +28,9 @@ export function Settlements(props: ISettlementsProps) {
     
     
     return (
-    <>
-        <h1>Plati sugerate</h1>
-        <table>
+    <Card sx={{marginTop: "24px", padding: "8px"}}>
+        <Typography variant="h4">Plati sugerate</Typography>
+            <table style={{maxWidth: "960px", marginInline: "auto", marginTop: "16px"}}>
             <tr>
                 <td>Hikerist platitor</td>
                 <td>Hikerist primitor</td>
@@ -37,7 +38,7 @@ export function Settlements(props: ISettlementsProps) {
             </tr>
             {settlementRows}
         </table>
-    </>
+    </Card>
     )
 }
 

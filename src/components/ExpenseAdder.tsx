@@ -1,4 +1,4 @@
-import { Button, MenuItem, Select, TextField, Typography } from "@mui/material";
+import { Button, Card, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 
 export interface IExpenseAdderProps {
@@ -14,7 +14,7 @@ export function ExpenseAdder(props: IExpenseAdderProps) {
     const selections = props.participantList.length != 0 ? props.participantList.map(participant => <MenuItem value={participant}>{participant}</MenuItem>) : <MenuItem value={"default"}>Fara hikeristi adaugati</MenuItem>;
     
     return (
-        <>
+        <Card sx={{marginTop: "24px", width: "100%", padding: "8px"}}>
         <Typography variant="h4">Adaugare cheltuiala</Typography>
         <Select disabled={props.participantList.length == 0} value={expensePerson} onChange={(event) => setExpensePerson(event.target.value)}>
             {selections}
@@ -22,6 +22,6 @@ export function ExpenseAdder(props: IExpenseAdderProps) {
         <TextField onChange={(event) => setExpenseSum(event.target.value)} value={expenseSum} size="small"></TextField>
         <TextField type="text" placeholder="Descriere (optionala)" size="small" onChange={(event) => setExpenseDescription(event.target.value)} value={expenseDescription}></TextField>
         <Button disabled={props.participantList.length == 0} variant="contained" onClick={() => props.onAddExpense(expensePerson, expenseSum, expenseDescription)}>Adauga</Button>
-        </>
+        </Card>
     )
 }
