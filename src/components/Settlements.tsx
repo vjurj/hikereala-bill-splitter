@@ -1,6 +1,7 @@
-import { Card, Typography } from "@mui/material";
+import { Card, Stack, Typography } from "@mui/material";
 import type { Expense } from "../App";
 import { calculateBalances, type BalancePerPerson } from "./Balances"
+import PriceChangeIcon from '@mui/icons-material/PriceChange';
 
 export interface ISettlementsProps {
     expenses: Expense[]
@@ -29,8 +30,12 @@ export function Settlements(props: ISettlementsProps) {
     
     return (
     <Card sx={{marginTop: "24px", padding: "8px"}}>
+        <Stack direction="column" gap={2} sx={{maxWidth: "480px", marginInline:"auto"}}>
+        <Stack direction="row" gap={2}>
+            <PriceChangeIcon fontSize="large"></PriceChangeIcon>
         <Typography variant="h4">Plati sugerate</Typography>
-            <table style={{maxWidth: "960px", marginInline: "auto", marginTop: "16px"}}>
+        </Stack>
+            <table style={{maxWidth: "960px"}}>
             <tr>
                 <td>Hikerist platitor</td>
                 <td>Hikerist primitor</td>
@@ -38,6 +43,7 @@ export function Settlements(props: ISettlementsProps) {
             </tr>
             {settlementRows}
         </table>
+        </Stack>
     </Card>
     )
 }

@@ -1,5 +1,6 @@
-import { Card, Typography } from "@mui/material";
+import { Card, Stack, Typography } from "@mui/material";
 import type { Expense } from "../App"
+import PaymentsIcon from '@mui/icons-material/Payments';
 
 export interface IBalancesProps {
     expenses: Expense[],
@@ -53,12 +54,14 @@ export function Balances(props: IBalancesProps) {
 
     const calculatedBalances = calculateBalances(props.expenses);
 
-    // props.onSetBalances(calculatedBalances);
-
     return(
-        <Card sx={{marginTop: "24px", width: "100%", padding: "8px"}}>
+        <Card sx={{marginTop: "24px", padding: "8px"}}>
+           <Stack gap={2} sx={{maxWidth: "480px", marginInline: "auto"}}>
+            <Stack direction="row" gap={2}>
+            <PaymentsIcon fontSize="large"></PaymentsIcon>
             <Typography variant="h4">Solduri (pozitiv = de primit, negativ = de platit)</Typography>
-        <table style={{maxWidth: "960px", marginInline: "auto", marginTop: "16px"}}>
+        </Stack>
+        <table style={{maxWidth: "960px", marginTop: "16px"}}>
                <tr>
             <td>Hikerist</td>
             <td>Sold</td>
@@ -72,6 +75,7 @@ export function Balances(props: IBalancesProps) {
         }
 })}
         </table>
+        </Stack>
         </Card>
     )
 }

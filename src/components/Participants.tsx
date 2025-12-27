@@ -1,5 +1,6 @@
-import { Button, Card, Chip, TextField, Typography } from "@mui/material"
+import { Button, Card, Chip, Stack, TextField, Typography } from "@mui/material"
 import { useState } from "react"
+import GroupsIcon from '@mui/icons-material/Groups';
 
 export interface IParticipantsProps {
     participantList: any[]
@@ -17,13 +18,22 @@ export function Participants(
 
     return (
        <Card sx={{marginTop: "24px", padding: "8px"}}>
-        <Typography variant="h4" >Hikeristii participanti</Typography>
-        <TextField onChange={(event) => setParticipantToAdd(event.target.value)} value={participantToAdd} size="small"></TextField>
-        <Button onClick={() => props.onAddParticipant(participantToAdd)}variant="contained">Adauga hikeristul/hikerista</Button>
+         <Stack sx={{maxWidth: "480px", marginInline: "auto"}} direction="column" spacing={2} overflow={"auto"} >
+        <Stack direction="row" gap={2}>
+             <GroupsIcon fontSize="large"></GroupsIcon>
+             <Typography variant="h4">Hikeristi participanti</Typography>
+        </Stack>
+    
+        <Stack direction="row" spacing={2}>
+        <TextField margin="normal"  onChange={(event) => setParticipantToAdd(event.target.value)} value={participantToAdd} size="small"></TextField>
+        <Button onClick={() => props.onAddParticipant(participantToAdd)}variant="contained">Adauga</Button>
+        </Stack>
+        <Stack direction="row" spacing={2}>
         <div>
             {props.participantList.map(participant => <Chip sx={{margin: "4px"}} color="info" label={participant} onDelete={() => handleDelete(participant)}></Chip>)}
         </div>
-        {/* <Typography>Fiecare isi va primi/plati partea, chiar daca nu a cumparat nimic</Typography> */}
+        </Stack>
+        </Stack>
         </Card>
     )
 }

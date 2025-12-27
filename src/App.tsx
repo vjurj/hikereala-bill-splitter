@@ -6,7 +6,8 @@ import { ExpenseList } from './components/ExpenseList'
 import { Balances, type BalancePerPerson } from './components/Balances'
 import { Settlements } from './components/Settlements'
 import { Footer } from './components/Footer'
-import { Paper, Typography } from '@mui/material'
+import { Stack, Typography } from '@mui/material'
+import image from "./assets/hikereala_bill_splitter_header.png"
 
 export interface Expense {
   name: string,
@@ -39,7 +40,11 @@ function App() {
   }
 
   return (
-    <Paper>
+    <Stack gap={2} sx={{maxWidth: "480px", marginInline: "auto"}}>
+      <img
+        src={image}
+        loading="lazy"
+       />
     <Typography variant="h4">HBS </Typography>
     <Typography variant="h5">(Hikereala bill splitter)</Typography>
     <Participants onAddParticipant={onAddParticipant} participantList={participants} onDeleteParticipant={onDeleteParticipant}/>
@@ -48,7 +53,7 @@ function App() {
     <Balances expenses={expenses} onSetBalances={onSetBalances}/>
     <Settlements expenses={expenses}/>
     <Footer/>
-     </Paper>
+    </Stack>
   )
 }
 
