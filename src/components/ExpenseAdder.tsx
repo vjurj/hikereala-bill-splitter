@@ -21,7 +21,7 @@ export function ExpenseAdder(props: IExpenseAdderProps) {
             <AddShoppingCartIcon fontSize="large"></AddShoppingCartIcon>
             <Typography variant="h4">Adaugare cheltuiala</Typography>
             </Stack>
-             <Stack direction={"row"} gap={2}>
+             <Stack sx={{justifyContent: "space-between"}} direction={"row"} gap={2}>
             <Select sx={{height: "40px",}} disabled={props.participantList.length == 0} value={expensePerson} onChange={(event) => setExpensePerson(event.target.value)}>
                 {selections}
             </Select>

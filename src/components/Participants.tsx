@@ -24,7 +24,7 @@ export function Participants(
              <Typography variant="h4">Hikeristi participanti</Typography>
         </Stack>
     
-        <Stack direction="row" spacing={2}>
+        <Stack sx={{justifyContent: "space-between"}} direction="row" spacing={2}>
         <TextField margin="normal"  onChange={(event) => setParticipantToAdd(event.target.value)} value={participantToAdd} size="small"></TextField>
         <Button onClick={() => props.onAddParticipant(participantToAdd)}variant="contained">Adauga</Button>
         </Stack>

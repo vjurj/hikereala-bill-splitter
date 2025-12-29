@@ -44,6 +44,7 @@ function App() {
       <img
         src={image}
         loading="lazy"
+        style={{borderRadius: "10px"}}
        />
     <Typography variant="h4">HBS </Typography>
     <Typography variant="h5">(Hikereala bill splitter)</Typography>
